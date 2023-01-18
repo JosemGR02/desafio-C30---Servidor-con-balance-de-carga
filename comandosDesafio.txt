@@ -1,0 +1,73 @@
+
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| COMANDOS DESAFIO.TXT |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+
++++++++++++++++( UTILIZANDO FORK Y CLUSTER )++++++++++++++++++
+
+
+¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con Nodemon:
+
+
+nodemon src/app.js 
+
+nodemon src/app.js -m fork -p 8081
+
+nodemon src/app.js -m cluster -p 8082
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con PM2:
+
+
+pm2 start src/app.js
+
+pm2 start src/app.js --name="Server1" --wacht -p 8081  
+
+pm2 start src/app.js --name="Server2" --wacht -i max -p 8082  
+
+pm2 list
+
+pm2 stop 3 (o/y pid)
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//<><><><><><><><><><>| CAMBIOS CONFIG NGINX :
+
+
+    listen       8080;
+
+
+    upstream fork {
+        server 127.0.0.1:8081;
+
+    }
+
+    upstream cluster {
+        server 127.0.0.1.8082;
+        server 127.0.0.1.8083;
+        server 127.0.0.1.8084;
+        server 127.0.0.1.8085;
+    }
+
+
+    location / {
+        root   html;
+        index  index.html index.htm;
+    }
+
+    location /api/info/ {
+        proxy_pass http://fork;        
+    }
+
+    location /api/autenticacion/ {
+        proxy_pass http://fork;        
+    }
+
+    location /api/randoms/ {
+        proxy_pass http://cluster;
+    }
