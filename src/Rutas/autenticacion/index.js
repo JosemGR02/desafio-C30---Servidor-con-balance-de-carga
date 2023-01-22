@@ -1,10 +1,7 @@
 
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| Ruta Autenticacion |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
 import passport from "passport";
 import { Router } from "express";
 import { estaAutenticado } from "../../Middlewares/index.js";
-
 
 const ruta = Router();
 
@@ -19,29 +16,34 @@ ruta.get("/login", estaAutenticado, (solicitud, respuesta) => {
     respuesta.render("view/login");
 });
 
-ruta.post("/login", passport.authenticate("inicioSesion", { failureRedirect: "/errorlogin" }),
+ruta.post("/login", passport.authenticate("login", { failureRedirect: "/api/autenticacion/error-login" }),
     (solicitud, respuesta) => {
-        res.redirect("/");
+        respuesta.redirect("/");
     }
 );
 
 // Registrarse
 ruta.get("/signup", (solicitud, respuesta) => {
-    respuesta.render("view/signup");
+    respuesta.render("view/home", { email: solicitud.respuestaUsuario });
 });
 
-ruta.post("/signup", passport.authenticate("registrarse", { failureRedirect: "/erroregister" }),
+ruta.post("/signup", passport.authenticate("signup", { failureRedirect: "/api/autenticacion/error-signup" }),
     (solicitud, respuesta) => {
-        res.redirect("/");
+        respuesta.redirect("/");
     }
 );
 
 // Cerrar Sesion
 ruta.get("/logout", (solicitud, respuesta) => {
-    const { email } = solicitud.usuario;
     solicitud.logout();
-    respuesta.render("view/logout", { email });
+    respuesta.render("view/logout", { email: solicitud.respuestaUsuario });
 });
+
+// const { email } = req.body
+// res.render('logout', { email }) {{email}}
+
+// Deserializar
+// const respuestaUsuario = await DaoUsuario.obtenerXid(id);
 
 // Rutas Errores
 ruta.get("/error-login", (solicitud, respuesta) => {

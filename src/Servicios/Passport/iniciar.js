@@ -1,5 +1,6 @@
 
 import passport from "passport";
+import mongoose from "mongoose";
 import { Strategy as LocalStrategy } from "passport-local";
 import { BCRYPT_VALIDADOR, ERRORES_UTILS } from '../../Utilidades/index.js';
 import { DaoUsuario } from "../../Dao/index.js";
@@ -8,14 +9,14 @@ import { DaoUsuario } from "../../Dao/index.js";
 const iniciar = () => {
 
     // Serializar 
-    passport.serializeUser((usuario, done) => {
-        done(null, usuario._id);
+    passport.serializeUser((respuestaUsuario, done) => {
+        done(null, respuestaUsuario.id);
     });
 
     // Deserializar
     passport.deserializeUser(async (id, done) => {
-        const usuario = await DaoUsuario.obtenerXid(id);
-        done(null, usuario);
+        const respuestaUsuario = await DaoUsuario.obtenerXid(id);
+        done(null, respuestaUsuario);
     });
 
     // Estrategias Locales
@@ -28,25 +29,31 @@ const iniciar = () => {
     }, async (solicitud, email, contraseña, done) => {
         try {
             if (!email || !contraseña) return respuesta.send({ success: false })
+            console.log(`usuario: ${email}, contraseña: ${contraseña}`)
 
-            DaoUsuario.obtenerUno({ email }, (error, usuario) => {
-                if (error) return done(null, false)
+            const usuarioYaExiste = await DaoUsuario.obtenerUno({ 'email': email }, (error, usuario) => {
+                if (error) return console.log("Error al buscar el usuario");
 
                 if (!usuario) {
                     console.log({ error: ERRORES_UTILS.MESSAGES.ERROR_USUARIO_O_CONTRA });
-                    return done(null, false)
+                    return done(null, false, { mensaje: 'Usuario no encontrado' })
                 }
+
                 if (!BCRYPT_VALIDADOR.validarContraseña(usuario, contraseña)) {
                     console.log({ error: ERRORES_UTILS.MESSAGES.ERROR_USUARIO_O_CONTRA });
                     return done(null, false)
                 }
 
+                if (usuario) return console.log(`Usuario encontrado: ${usuario}`);
+            })
+
+            if (usuarioYaExiste) {
                 const respuestaUsuario = {
-                    id: usuario._id,
-                    email: usuario.email
+                    id: usuarioYaExiste._id,
+                    email: usuarioYaExiste.email
                 }
                 return done(null, respuestaUsuario)
-            })
+            }
         } catch (error) {
             console.log(`${error}, Error en Passport - inicio Sesion`);
         }
@@ -60,8 +67,13 @@ const iniciar = () => {
     }, async (solicitud, email, contraseña, done) => {
         try {
             if (!email || !contraseña) return respuesta.send({ success: false })
+            console.log(`usuario: ${email}, contraseña: ${contraseña}`)
 
-            const usuarioYaExiste = await DaoUsuario.obtenerUno({ email })
+            const usuarioYaExiste = await DaoUsuario.obtenerUno({ email: 'email' }, (error, usuario) => {
+                if (!usuario) return console.log("usuario disponible para registrar");
+                if (usuario) return console.log(`El usuario ya existe: ${usuario}`);
+                if (error) return console.log("Error al buscar un usuario");
+            })
 
             if (usuarioYaExiste && usuarioYaExiste.contraseña) {
                 return respuesta.send({ success: false, error: 'Error, el usuario ya esta registrado' })
@@ -72,19 +84,29 @@ const iniciar = () => {
                 return respuesta.send({ success: true, usuarioActualizado })
             }
 
+            let idUsuario = mongoose.Types.ObjectId();
+            console.log(idUsuario)
+
             const nuevoUsuario = {
+                id: idUsuario,
                 email: solicitud.body.email,
                 contraseña: BCRYPT_VALIDADOR.crearContraHash(contraseña)
             }
+            console.log(nuevoUsuario)
 
-            DaoUsuario.guardar(nuevoUsuario, (error, nuevoUsuario) => {
+            const crearUsuario = await DaoUsuario.guardar(nuevoUsuario, (error, nuevoUsuario) => {
                 if (error) {
                     console.log(` ${error}, Error al guardar el usuario`);
                     return done(null, false)
                 }
 
-                console.log(`Usuario ${nuevoUsuario} registrado correctamente`);
-                return done(null, true)
+                const UsuarioCreado = {
+                    id: crearUsuario._id,
+                    email: crearUsuario.email,
+                }
+
+                console.log(`Usuario ${UsuarioCreado.email} registrado correctamente`);
+                return done(null, UsuarioCreado)
             })
         } catch (error) {
             console.log(`${error}, Error en Passport - Registro`);
@@ -95,4 +117,7 @@ const iniciar = () => {
 export const PassportAutenticacion = {
     iniciar,
 }
+
+
+
 

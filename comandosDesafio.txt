@@ -8,12 +8,15 @@
 
 ¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con Nodemon:
 
+ls
 
-nodemon src/app.js 
+cd src/
 
-nodemon src/app.js -m fork -p 8081
+nodemon app.js -m FORK -p 8081   (creo que quedo bien)
 
-nodemon src/app.js -m cluster -p 8082
+nodemon app.js -m CLUSTER -p 8082
+
+ps
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -22,21 +25,78 @@ nodemon src/app.js -m cluster -p 8082
 ¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con PM2:
 
 
-pm2 start src/app.js
+ls
 
-pm2 start src/app.js --name="Server1" --wacht -p 8081  
+cd src/
 
-pm2 start src/app.js --name="Server2" --wacht -i max -p 8082  
+pm2 start app.js --name="Server1"
+
+-----------------------
+
+++++++| lo que deberia:
+
+ls
+
+cd src/
+
+pm2 start app.js --name="Server1" --wacht -- 8081     (FORK)
+
+pm2 start app.js --name="Server2" --wacht -i max -- 8082  (CLUSTER)
 
 pm2 list
 
-pm2 stop 3 (o/y pid)
+ps
+
+pm2 monit
+
+pm2 logs
+
+pm2 stop 0
+
+pm2 delete 0
+
+
+
+-----------------------
+
+<><><><><| prueba:
+
+pm2 start app.js --name="Server2" -- -- port=8081 --modo=cluster
+
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con NGINX:
+
+carpeta Nginx
+
+pwd
+
+./nginx.exe -s reload  
+
+./nginx.exe -s stop 
+
+./nginx.exe -s quit 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 //<><><><><><><><><><>| CAMBIOS CONFIG NGINX :
+
+
+    upstream fork {
+        server 127.0.0.1:8080;
+
+    }
+
+    upstream cluster {
+        server 127.0.0.1.8081;
+    }
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     listen       8080;
@@ -54,7 +114,6 @@ pm2 stop 3 (o/y pid)
         server 127.0.0.1.8085;
     }
 
-
     location / {
         root   html;
         index  index.html index.htm;
@@ -71,3 +130,60 @@ pm2 stop 3 (o/y pid)
     location /api/randoms/ {
         proxy_pass http://cluster;
     }
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+¬¬¬¬¬¬¬¬¬¬( punto extra opcional )
+
+    upstream cluster {
+        server 127.0.0.1.8082 weight=1;
+        server 127.0.0.1.8083 weight=3;
+        server 127.0.0.1.8084 weight=2;
+        server 127.0.0.1.8085 weight=1;
+    }
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+nginx 
+
+lo asocia con el proyecto con un 
+
+node app.js 8082
+
+(consola aparte)
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// pruebas fork y cluster:
+
+// node app.js 8080
+// nodemon app.js 8080
+
+
+
+// comandos ejecucion server modos y puertos:
+
+// nodemon app.js -m cluster -p 8080
+// nodemon app.js -m fork -p 8080
+
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+// con pm2
+// pm2 start app.js -name="Server2" --wacht -- 8081 
+// pm2 start app.js --name="Server2" --wacht -i max -- 8082 
+
+
+
+// pm2 start app.js --modo=FORK --port=8080
+
+
+--CLUSTER / -- CLUSTER (paramentro verificar)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

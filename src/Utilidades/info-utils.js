@@ -1,6 +1,8 @@
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| Utils Info |~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+import os from 'os';
+
 
 const argumentosEntrada = process.argv
 const pathEjecucion = process.execPath

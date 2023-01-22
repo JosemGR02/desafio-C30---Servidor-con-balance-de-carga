@@ -7,13 +7,15 @@ import MongoStore from 'connect-mongo';
 import __dirname from "./dirname.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import path from 'path';
-import dotenv from 'dotenv';
-import { config } from './Configuracion/config.js';
-import { RutaRandoms, RutAutenticacion, RutaInfo } from "./Rutas/index.js";
+import cluster from 'cluster';
+import _yargs from 'yargs';
+const yargs = _yargs(hideBin(process.argv));
+import { INFO_UTILS } from './Utilidades/index.js';
+import { RutaRandoms, RutAutenticacion, RutaInfo, RutaServidor } from "./Rutas/index.js";
 import { errorMiddleware } from './Middlewares/index.js';
 import { PassportAutenticacion } from './Servicios/index.js';
-
+import { hideBin } from 'yargs/helpers';
+// import { config } from './Configuracion/config.js';
 
 const app = express();
 
@@ -53,26 +55,17 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('/public'))
 
 
-// Dotenv
-const configDotenv = { path: path.resolve(__dirname, '.env') }
-
-dotenv.config(configDotenv);
-
-console.log("Datos .Env x Dotenv: ", process.env.BASEDATOS_SELECCIONADA)
-
-
-// Minimist  ||  Package.json - scripts: "start8080": "node archivo.js -p 8080" 
-
-// import parseArgs from "minimist";
-
-// const options = {
-//     default: { puerto: 8080 },
-//     alias: {
-//         p: 'puerto',
-//     }
-// }
-// const argumentos = parseArgs(process.argv.slice(2), options)
-// console.log(argumentos)
+// Yargs
+const args = yargs
+    .default({
+        modo: "FORK",
+        puerto: 8080,
+    })
+    .alias({
+        m: "modo",
+        p: "puerto",
+    })
+    .argv;
 
 
 // Middleware del error
@@ -87,14 +80,37 @@ app.set('views', './public/Vistas');
 
 
 // Rutas
+app.use('/api/', RutaServidor)
 app.use('/api/info', RutaInfo)
 app.use('/api/randoms', RutaRandoms)
 app.use('/api/autenticacion', RutAutenticacion);
 
 
+// Modo de ejecucion
+if (args.modo == 'CLUSTER') {
+    if (cluster.isPrimary) {
+        console.log('Ejecucion en Modo Cluster')
+        console.log(`Primario corriendo con el id: ${process.pid} -- Puerto ${args.puerto}`);
+
+        for (let i = 0; i < INFO_UTILS.procesadoresdCpus; i++) {
+            cluster.fork();
+        }
+
+        cluster.on('exit', worker => {
+            console.log(`El trabajador con el id:${worker.process.pid} ha finalizado.`);
+            cluster.fork();
+        });
+    } else {
+        console.log(`Trabajador iniciado con el id: ${process.pid}`);
+    }
+} else {
+    console.log('Ejecucion en Modo Fork')
+}
+
+
 // Servidor
-app.listen(config.SERVER.PUERTO, async () => {
-    console.log(`Servidor escuchando en el puerto: ${config.SERVER.PUERTO}`);
+app.listen(args.puerto, async () => {
+    console.log(`Servidor escuchando en el puerto: ${args.puerto}`);
     try {
         await mongoose.connect(process.env.BASEDATOS_MONGO_URL, mongOptiones);
         console.log("Conectado a Base de Datos Mongo");
@@ -103,4 +119,6 @@ app.listen(config.SERVER.PUERTO, async () => {
     }
 })
 app.on("error", (error) => console.log(`Error en servidor ${error}`));
+
+
 

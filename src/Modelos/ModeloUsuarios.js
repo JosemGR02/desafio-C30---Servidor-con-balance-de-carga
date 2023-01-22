@@ -1,12 +1,18 @@
 
 import { Schema } from "mongoose";
+// import mongoose from "mongoose";
 
-const ColeccionUsuarios = "usuarios";
+const ColeccionUsuarios = "UsuariosM";
 
 const esquemaUsuario = new Schema({
-    email: String,
-    contraseña: String,
+    // id: { type: String, required: true, max: 20 },
+    email: { type: String, required: true, unique: true, max: 30 },
+    contraseña: { type: String, required: true, max: 30 },
 });
+
+// esquemaUsuario._id = new mongoose.Types.ObjectId();
+
+// const usuario.id = new mongoose.Types.ObjectId();
 
 
 

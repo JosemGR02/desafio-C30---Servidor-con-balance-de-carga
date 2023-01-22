@@ -147,16 +147,30 @@ if (CLUSTER) {
 
 
 
+import express from 'express';
+import cluster from 'node:cluster';
+import os from 'os';
+const nrosCPU = os.cpus().length
 
 
+// const PORT = process.argv[2] || 2311
 
-
-
-
-
-
-
-
+if (cluster.isPrimary) {
+    for (let index = 0; index < nrosCPU; index++) {
+        cluster.fork()
+    }
+    // cluster.forEach(element => {
+    //     cluster.fork()
+    // });
+    cluster.on('exit', worker => {
+        console.log(`Trabajador ${worker.process.pid} finalizado.`);
+        cluster.fork();
+    });
+} else {
+    app.listen(PORT, () => {
+        console.log(`SERVIDOR ON ${PORT} - PID ${process.pid} `)
+    })
+}
 
 
 
@@ -200,9 +214,10 @@ if (CLUSTER) {
 // Minimist  ||  Package.json - scripts: "start8080": "node archivo.js -p 8080"
 
 // const options = {
-//     default: { puerto: 8080 },
+//     default: { puerto: 8080, modo: fork },
 //     alias: {
 //         p: 'puerto',
+//         m: 'modo',
 //     }
 // }
 // const argumentos = parseArgs(process.argv.slice(2), options)
