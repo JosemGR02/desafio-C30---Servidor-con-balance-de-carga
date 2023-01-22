@@ -54,6 +54,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('/public'))
 
+// const modoCluster = process.argv[2] == 'CLUSTER'   //(opcion2)
 
 // Yargs
 const args = yargs
@@ -76,7 +77,7 @@ app.engine("hbs", handlebars.engine({ extname: ".hbs", defaultLayout: "main.hbs"
 
 app.set('view engine', 'hbs')
 app.set('views', './public/Vistas');
-// app.set('views', __dirname + "/view");
+// app.set('views', __dirname + "/Vistas");
 
 
 // Rutas
@@ -86,8 +87,9 @@ app.use('/api/randoms', RutaRandoms)
 app.use('/api/autenticacion', RutAutenticacion);
 
 
+
 // Modo de ejecucion
-if (args.modo == 'CLUSTER') {
+if (args.modo == 'CLUSTER') {   // modoCluster (opcion2)
     if (cluster.isPrimary) {
         console.log('Ejecucion en Modo Cluster')
         console.log(`Primario corriendo con el id: ${process.pid} -- Puerto ${args.puerto}`);

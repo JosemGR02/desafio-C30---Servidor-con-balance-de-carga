@@ -10,38 +10,30 @@
 
 ls
 
-cd src/
+nodemon src/app.js -m FORK -p 8081   (creo que quedo bien)   
 
-nodemon app.js -m FORK -p 8081   (creo que quedo bien)
-
-nodemon app.js -m CLUSTER -p 8082
+nodemon src/app.js -m CLUSTER -p 8082
 
 ps
 
+
+sino funca anterior
+-> ( nodemon src/app.js CLUSTER -p 8081 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 ¬¬¬¬¬¬¬¬¬¬¬| Ejecucion del Servidor con PM2:
 
+(pm2 start src/app.js --name="Server1")
 
 ls
 
 cd src/
 
-pm2 start app.js --name="Server1"
+pm2 start src/app.js --name="Server1" --wacht -- 8081     (FORK)   (problema --wach)
 
------------------------
-
-++++++| lo que deberia:
-
-ls
-
-cd src/
-
-pm2 start app.js --name="Server1" --wacht -- 8081     (FORK)
-
-pm2 start app.js --name="Server2" --wacht -i max -- 8082  (CLUSTER)
+pm2 start src/app.js --name="Server2" --wacht -i max -- 8082  (CLUSTER)
 
 pm2 list
 
@@ -56,12 +48,11 @@ pm2 stop 0
 pm2 delete 0
 
 
-
 -----------------------
 
-<><><><><| prueba:
+|><><><><><| Prueba:
 
-pm2 start app.js --name="Server2" -- -- port=8081 --modo=cluster
+pm2 start src/app.js --name="Server2" -- -- port=8081 --modo=cluster
 
 
 
@@ -83,9 +74,9 @@ pwd
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+|<><><><><><><><><><>| CAMBIOS CONFIG NGINX :
 
-//<><><><><><><><><><>| CAMBIOS CONFIG NGINX :
-
+¬¬¬¬¬¬¬¬¬¬| modificacion 1
 
     upstream fork {
         server 127.0.0.1:8080;
@@ -98,6 +89,7 @@ pwd
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+¬¬¬¬¬¬¬¬¬¬| modificacion final Nginx.conf
 
     listen       8080;
 
@@ -143,47 +135,3 @@ pwd
     }
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-nginx 
-
-lo asocia con el proyecto con un 
-
-node app.js 8082
-
-(consola aparte)
-
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-// pruebas fork y cluster:
-
-// node app.js 8080
-// nodemon app.js 8080
-
-
-
-// comandos ejecucion server modos y puertos:
-
-// nodemon app.js -m cluster -p 8080
-// nodemon app.js -m fork -p 8080
-
-
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-// con pm2
-// pm2 start app.js -name="Server2" --wacht -- 8081 
-// pm2 start app.js --name="Server2" --wacht -i max -- 8082 
-
-
-
-// pm2 start app.js --modo=FORK --port=8080
-
-
---CLUSTER / -- CLUSTER (paramentro verificar)
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
