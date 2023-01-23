@@ -10,15 +10,11 @@
 
 ls
 
-nodemon src/app.js -m FORK -p 8081   (creo que quedo bien)   
+nodemon src/app.js -m FORK -p 8081   
 
 nodemon src/app.js -m CLUSTER -p 8082
 
 ps
-
-
-sino funca anterior
--> ( nodemon src/app.js CLUSTER -p 8081 )
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -29,9 +25,7 @@ sino funca anterior
 
 ls
 
-cd src/
-
-pm2 start src/app.js --name="Server1" --wacht -- 8081     (FORK)   (problema --wach)
+pm2 start src/app.js --name="Server1" --wacht -- 8081     (FORK) 
 
 pm2 start src/app.js --name="Server2" --wacht -i max -- 8082  (CLUSTER)
 
@@ -46,14 +40,6 @@ pm2 logs
 pm2 stop 0
 
 pm2 delete 0
-
-
------------------------
-
-|><><><><><| Prueba:
-
-pm2 start src/app.js --name="Server2" -- -- port=8081 --modo=cluster
-
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,5 +119,9 @@ pwd
         server 127.0.0.1.8084 weight=2;
         server 127.0.0.1.8085 weight=1;
     }
+
+
+
+
 
 

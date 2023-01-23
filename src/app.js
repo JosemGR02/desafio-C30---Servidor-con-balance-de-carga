@@ -15,7 +15,7 @@ import { RutaRandoms, RutAutenticacion, RutaInfo, RutaServidor } from "./Rutas/i
 import { errorMiddleware } from './Middlewares/index.js';
 import { PassportAutenticacion } from './Servicios/index.js';
 import { hideBin } from 'yargs/helpers';
-// import { config } from './Configuracion/config.js';
+import { config } from './Configuracion/config.js';
 
 const app = express();
 
@@ -54,7 +54,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('/public'))
 
-// const modoCluster = process.argv[2] == 'CLUSTER'   //(opcion2)
 
 // Yargs
 const args = yargs
@@ -67,6 +66,8 @@ const args = yargs
         p: "puerto",
     })
     .argv;
+
+const PUERTO = args.puerto || config.SERVER.PORT
 
 
 // Middleware del error
@@ -88,11 +89,11 @@ app.use('/api/autenticacion', RutAutenticacion);
 
 
 
-// Modo de ejecucion
-if (args.modo == 'CLUSTER') {   // modoCluster (opcion2)
+// Modo de ejecucion 
+if (args.modo == 'CLUSTER') {
     if (cluster.isPrimary) {
         console.log('Ejecucion en Modo Cluster')
-        console.log(`Primario corriendo con el id: ${process.pid} -- Puerto ${args.puerto}`);
+        console.log(`Primario corriendo con el id: ${process.pid} -- Puerto ${PUERTO}`);
 
         for (let i = 0; i < INFO_UTILS.procesadoresdCpus; i++) {
             cluster.fork();
@@ -103,24 +104,32 @@ if (args.modo == 'CLUSTER') {   // modoCluster (opcion2)
             cluster.fork();
         });
     } else {
-        console.log(`Trabajador iniciado con el id: ${process.pid}`);
+        // Servidor
+        app.listen(PUERTO, async () => {
+            console.log(`Servidor escuchando en el puerto: ${PUERTO}, Trabajador iniciado con el id: ${process.pid}`);
+            try {
+                await mongoose.connect(process.env.BASEDATOS_MONGO_URL, mongOptiones);
+                console.log("Conectado a Base de Datos Mongo");
+            } catch (error) {
+                console.log(`Error en conexión de Base de datos: ${error}`);
+            }
+        })
+        app.on("error", (error) => console.log(`Error en servidor ${error}`));
     }
 } else {
     console.log('Ejecucion en Modo Fork')
+
+    // Servidor
+    app.listen(PUERTO, async () => {
+        console.log(`Servidor escuchando en el puerto: ${PUERTO}, Trabajador iniciado con el id: ${process.pid}`);
+        try {
+            await mongoose.connect(process.env.BASEDATOS_MONGO_URL, mongOptiones);
+            console.log("Conectado a Base de Datos Mongo");
+        } catch (error) {
+            console.log(`Error en conexión de Base de datos: ${error}`);
+        }
+    })
+    app.on("error", (error) => console.log(`Error en servidor ${error}`));
 }
 
-
-// Servidor
-app.listen(args.puerto, async () => {
-    console.log(`Servidor escuchando en el puerto: ${args.puerto}`);
-    try {
-        await mongoose.connect(process.env.BASEDATOS_MONGO_URL, mongOptiones);
-        console.log("Conectado a Base de Datos Mongo");
-    } catch (error) {
-        console.log(`Error en conexión de Base de datos: ${error}`);
-    }
-})
-app.on("error", (error) => console.log(`Error en servidor ${error}`));
-
-
-
+export { PUERTO };
