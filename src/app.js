@@ -81,7 +81,7 @@ app.set('views', './public/Vistas');
 // app.set('views', __dirname + "/Vistas");
 
 
-// Rutas
+// Rutas 
 app.use('/api/', RutaServidor)
 app.use('/api/info', RutaInfo)
 app.use('/api/randoms', RutaRandoms)
