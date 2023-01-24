@@ -25,9 +25,9 @@ ps
 
 ls
 
-pm2 start src/app.js --name="Server1" --wacht -- 8081     (FORK) 
+pm2 start src/app.js --name="Server1" --watch -- 8081     (FORK) 
 
-pm2 start src/app.js --name="Server2" --wacht -i max -- 8082  (CLUSTER)
+pm2 start src/app.js --name="Server2" --watch -i max -- 8080  (CLUSTER)
 
 pm2 list
 

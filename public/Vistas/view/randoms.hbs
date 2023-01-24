@@ -2,38 +2,28 @@
 <div>
     <h2> PAGINA NUMEROS RANDOMS </h2>
     <div>
-        <h3>Todos los numeros randoms:</h3>
-        {{#if objetoUtils.lenght}}
-            <li>{{this.todosLosNumeros}}</li>
+        <h3>Ir a otras paginas:</h3>
+        <button class="btn btn-success" onclick="location.href='/api/autenticacion/login'">Ir pagina de inicio</button>
+        <button class="btn btn-success" onclick="location.href='/api/info/'">Ir pagina de informacion</button>
+    </div>
+    <div>
+        <h3>Numeros Randoms Generados:</h3>
+        {{#if resultadoUtils}}
+        <table>
+            <tr>
+                <th>Número</th>
+                <th>Veces que se repitio</th>
+            </tr>
+            {{#each resultadoUtils}}
+                <tr>
+                    <td>{{@key}}</td>
+                    <td>{{this}}</td>
+                </tr>
+            {{/each}}
+        </table>
         {{/if}}
     </div>
-    <div>
-        <h3>Cantidad de veces que se repitio un numero:</h3>
-        <ul>
-            {{#if objetoUtils.lenght}}
-                    {{#if vecesRepetidos.lenght}}
-                        {{#each objetoClaveValor}}
-                            <li>El numero {{this.numero}} se repitió {{this.valor}} veces</li>
-                            {{!-- <li>El numero {{objetoClaveValor.numero}} se repitió {{objetoClaveValor.valor}} veces</li> --}}
-                        {{/each}}
-                    {{/if}}
-            {{/if}}
-        </ul>
-    </div>
-    <div>
-        <button class="btn btn-success" onclick="location.href='/api/autenticacion/login'">Ir pagina de inicio</button>
-    </div>
 </div>
-
-
-{{!-- <li>El numero {{array[1].name}} se repitió {{array[1].value}} veces</li> --}}
-
-{{!-- <li>El numero {{this.numero}} se repitió {{this.valor}} veces</li> --}}
-
-
-{{!-- 
-    objetoUtils.todosLosNumeros = totalNrosGenerados;
-    objetoUtils.vecesRepetidos = objetoClaveValor; --}}
 
 
 
