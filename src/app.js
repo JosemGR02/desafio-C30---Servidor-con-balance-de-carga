@@ -17,6 +17,7 @@ import { PassportAutenticacion } from './Servicios/index.js';
 import { hideBin } from 'yargs/helpers';
 import { config } from './Configuracion/config.js';
 
+
 const app = express();
 
 

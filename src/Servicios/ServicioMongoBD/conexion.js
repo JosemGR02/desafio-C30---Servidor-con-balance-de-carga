@@ -4,6 +4,7 @@ import { config } from "../../Configuracion/config.js";
 
 
 const init = async () => {
+    mongoose.set('strictQuery', true);
     try {
         mongoose.connect(config.DATABASES.mongo.url, {
             dbName: config.DATABASES.mongo.dbName,

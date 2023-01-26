@@ -24,7 +24,7 @@ ruta.post("/login", passport.authenticate("login", { failureRedirect: "/api/aute
 
 // Registrarse
 ruta.get("/signup", (solicitud, respuesta) => {
-    respuesta.render("view/home", { email: solicitud.respuestaUsuario });
+    respuesta.render("view/home", { email: solicitud.user.email });
 });
 
 ruta.post("/signup", passport.authenticate("signup", { failureRedirect: "/api/autenticacion/error-signup" }),
@@ -39,11 +39,6 @@ ruta.get("/logout", (solicitud, respuesta) => {
     respuesta.render("view/logout", { email: solicitud.respuestaUsuario });
 });
 
-// const { email } = req.body
-// res.render('logout', { email }) {{email}}
-
-// Deserializar
-// const respuestaUsuario = await DaoUsuario.obtenerXid(id);
 
 // Rutas Errores
 ruta.get("/error-login", (solicitud, respuesta) => {

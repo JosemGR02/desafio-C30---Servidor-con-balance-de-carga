@@ -1,6 +1,5 @@
 
 import fs from "fs";
-
 class ContenedorFileSystem {
     constructor(archivoNombre) {
         this.filePath = `./src/BaseDatos/${archivoNombre}.json`;
