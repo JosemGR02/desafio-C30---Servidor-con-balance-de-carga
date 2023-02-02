@@ -1,5 +1,5 @@
 
-export { ContenedorFileSystem } from "./contenedorFileSystem.js";
+export { ContenedorFileSystem } from "./contenedorfileSystem.js";
 
 export { ContenedorMongoBD } from "./contenedorMongoBD.js";
 
